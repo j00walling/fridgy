@@ -1,16 +1,18 @@
 import React from "react";
 
-interface QueryResponseProps {
-  queries: { question: string; response: string }[];
+interface Query {
+  question: string;
+  response: string;
+  timestamp: Date;
 }
 
-const QueryResponse: React.FC<QueryResponseProps> = ({ queries }) => {
+const QueryResponse = ({ queries }: { queries: Query[] }) => {
   return (
-    <div className="flex flex-col mb-4 w-[80%]">
-      {queries.map((q, index) => (
-        <div key={index} className="mb-2">
-          <p className="font-bold">You: {q.question}</p>
-          <p className="italic">Fridgy: {q.response}</p>
+    <div className="space-y-4">
+      {queries.map((query, index) => (
+        <div key={index} className="border rounded p-4">
+          <p className="font-bold">You: {query.question}</p>
+          <p>Fridgy: {query.response}</p>
         </div>
       ))}
     </div>
