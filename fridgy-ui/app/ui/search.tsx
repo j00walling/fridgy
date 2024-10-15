@@ -3,15 +3,18 @@
 import { useState, ChangeEvent } from "react";
 import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import Loader from "@/app/ui/loader";
-import { Query, SearchProps, ApiResponse } from "@/app/types/interfaces";
-import { fetchQueryResponse } from "@/app/lib/api";
+import { SearchProps } from "@/app/types/interfaces";
 import clsx from "clsx";
 
 export default function Search({
   inputValue,
   setInputValue,
-  setQueries,
-}: SearchProps) {
+  onSubmit,
+}: {
+  inputValue: string;
+  setInputValue: (value: string) => void;
+  onSubmit: (question: string) => Promise<void>;
+}) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -24,14 +27,9 @@ export default function Search({
 
     setLoading(true);
     try {
-      const data: ApiResponse = await fetchQueryResponse(question);
-      setQueries((prev: Query[]) => [
-        ...prev,
-        { question, response: data.answer },
-      ]);
-      setInputValue("");
+      await onSubmit(question);
     } catch (error) {
-      console.error("Error fetching response:", error);
+      console.error("Error submitting question:", error);
     } finally {
       setLoading(false);
     }

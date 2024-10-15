@@ -1,6 +1,7 @@
 export interface Query {
   question: string;
   response: string;
+  timestamp: Date; 
 }
 
 export interface ApiResponse {
