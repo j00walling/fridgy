@@ -33,7 +33,8 @@ The final step:
 
 [Inventory Management Features:]
 - Add items to the fridge with quantity and expiration dates.
-- Remove items from the inventory.\n- Display the current inventory.
+- Remove items from the inventory.
+- Display the current inventory.
 - Generate recipes based on available items.
 - Check if specific recipes can be made with the current inventory.
 """
