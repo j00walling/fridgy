@@ -37,7 +37,7 @@ pip install --upgrade openai
 pip install uvicorn
 ```
 
-3. Make a ".env" file in your working directory:  OPENAI_API_KEY=YOUR KEY HERE
+3. Make a ".env" file in your working directory and paste:  OPENAI_API_KEY=YOUR KEY HERE
 
 4. Run the Development Server
 
