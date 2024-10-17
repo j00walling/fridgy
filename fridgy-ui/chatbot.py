@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from openai import OpenAI
 from prompts import MAIN_PROMPT  # Import the MAIN_PROMPT from prompts.py
-import retrieve
+from retrieve import *
 import os
 
 load_dotenv()
@@ -15,6 +15,9 @@ class FridgyBot:
 
     def chat_complete_messages(self, messages, temperature) -> str:
         user_query = messages[-1]['content']
+
+        # Check if the query is about expiration dates
+        expiry_info = get_expiry_info(user_query)
     
         # Combine stored context with new messages
         full_context = self.context + messages
@@ -25,7 +28,7 @@ class FridgyBot:
         # inventory_info = retrieve.get_inventory_info(user_query)
         
         # Augment the user's query with relevant information
-        augmented_query = f"{user_query}"
+        augmented_query = f"{user_query}\n\nAdditional context: {expiry_info}"
         
         # Replace the user's query in the last message with the augmented query
         full_context[-1]['content'] = augmented_query
