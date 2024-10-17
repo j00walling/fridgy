@@ -27,11 +27,25 @@ cd fridgy/fridgy-ui
 ```bash
 pnpm install
 ```
+```bash
+pip install python-dotenv
+```
+```bash
+pip install --upgrade openai
+```
+```bash
+pip install uvicorn
+```
 
-3. Run the Development Server
+3. Make a ".env" file in your working directory and paste:  OPENAI_API_KEY=YOUR KEY HERE
+
+4. Run the Development Server
 
 ```bash
 pnpm run dev
+```
+```bash
+python main.py
 ```
 
 4. Open Your Browser
