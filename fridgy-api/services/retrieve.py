@@ -1,5 +1,3 @@
-# retrieve.py
-
 def retrieve_relevant_info(query, context):
     """
     This function retrieves relevant information based on user queries
@@ -7,6 +5,7 @@ def retrieve_relevant_info(query, context):
     """
     # Placeholder implementation
     return f"Relevant info for query: {query[:20]}... Context length: {len(context)}"
+
 
 def get_inventory_info(query):
     """

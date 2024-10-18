@@ -11,7 +11,7 @@ Fridgy is a Refrigerator Assistant Chatbot that helps users manage their refrige
   npm install -g pnpm
   ```
 
-## Setting Up the Project
+## Setting Up the Frontend
 
 Follow these steps to set up the project's UI locally
 
@@ -27,27 +27,66 @@ cd fridgy/fridgy-ui
 ```bash
 pnpm install
 ```
-```bash
-pip install python-dotenv
-```
-```bash
-pip install --upgrade openai
-```
-```bash
-pip install uvicorn
-```
 
-3. Make a ".env" file in your working directory and paste:  OPENAI_API_KEY=YOUR KEY HERE
-
-4. Run the Development Server
+3. Run the UI Server
 
 ```bash
 pnpm run dev
-```
-```bash
-python main.py
 ```
 
 4. Open Your Browser
 
 Visit http://localhost:3000 in your browser to see the application.
+
+
+## Setting Up the Backend
+
+Follow these steps to set up the project's backend locally
+
+1. Navigate to the fridgy-api folder
+
+```bash
+cd fridgy/fridgy-api
+```
+
+2. Create a .env file with your OpenAI API key
+
+```bash
+OPENAI_API_KEY={your_key_here}
+```
+
+3. Install virtualenv (if not already installed)
+
+```bash
+pip install virtualenv
+```
+
+4. Create/activate a virtual environment
+
+For windows:
+
+```bash
+virtualenv venv
+python -m venv venv
+venv\Scripts\activate
+```
+
+For macOS/Linux:
+
+```bash
+virtualenv venv
+python -m venv venv
+source venv/bin/activate
+```
+
+5. Install requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+6. Run the server
+
+```bash
+uvicorn app.main:app --reload
+```

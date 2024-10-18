@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
 from openai import OpenAI
-from prompts import MAIN_PROMPT  # Import the MAIN_PROMPT from prompts.py
-import retrieve
+from chatbot.prompts import MAIN_PROMPT
 import os
+
 
 load_dotenv()
 
