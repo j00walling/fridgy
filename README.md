@@ -63,7 +63,7 @@ pip install virtualenv
 
 4. Create/activate a virtual environment
 
-For windows:
+- For windows:
 
 ```bash
 virtualenv venv
@@ -71,7 +71,7 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-For macOS/Linux:
+- For macOS/Linux:
 
 ```bash
 virtualenv venv
