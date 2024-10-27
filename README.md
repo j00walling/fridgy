@@ -153,15 +153,23 @@ Log out of Postgres client with 'exit'. Log back in using:
 psql fridgy -U rick
 ```
 
-Make inventory table.
+Make user and inventory table.
 ```postgres
-CREATE TABLE IF NOT EXISTS inventory(
-id SERIAL PRIMARY KEY,
-email TEXT NOT NULL,
-item TEXT NOT NULL,
-quantity INTEGER NOT NULL,
-expiration_date TEXT NOT NULL
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
 );
 ```
 
-Start running fridgy_postgres.ipynb notebook for testing.
+```postgres
+CREATE TABLE inventory (
+    user_id INTEGER REFERENCES users(id),
+    item TEXT NOT NULL,
+    quantity INTEGER NOT NULL,
+    expiration_date DATE NOT NULL,
+    PRIMARY KEY (user_id, item)
+);
+```
+
+Run fridgy_postgres.ipynb notebook for testing.
