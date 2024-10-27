@@ -2,6 +2,8 @@ import datetime
 from typing import Any, Dict
 import psycopg2
 
+from database.db import get_db_connection
+
 # example Database of items and their expiry information
 expiry_database = {
     "milk": {"shelf_life": 7, "storage": "refrigerated"},
@@ -27,48 +29,34 @@ def manage_inventory(dml: str) -> Dict[str, Any]:
     INVENTORY MANAGEMENT
     This function selects, updates, inserts, or removes food items with a quantity and expiration date for a user query.
     """
-    try:
-        fridgy_db = psycopg2.connect(
-            host="localhost",        # Adjust if necessary
-            user="",         # Your PostgreSQL username
-            password="",     # Your PostgreSQL password
-            database="fridgy"      # Your database name
-        # Automatically commit after every transaction
-        )
-        # Enable autocommit mode
-        fridgy_db.autocommit = True
-        print("Database connection successful!")
-    except Exception as e:
-        print(f"Error: {e}")
+    conn = get_db_connection()
 
-    cursor = fridgy_db.cursor()
+    with conn.cursor() as cursor:
 
-    error_code = 0
-    result = None
+        error_code = 0
+        result = None
 
-    try:
-        # Assuming you have an active connection and cursor
-        cursor.execute(dml)
+        try:
+            # Assuming you have an active connection and cursor
+            cursor.execute(dml)
 
-        # Only fetch results for SELECT queries
-        if dml.strip().lower().startswith('select'):
-            result = cursor.fetchall()
-        else:
-            result = None
+            # Only fetch results for SELECT queries
+            if dml.strip().lower().startswith('select'):
+                result = cursor.fetchall()
+            else:
+                result = None
 
-        # Commit the transaction for DML queries like INSERT, UPDATE, DELETE
-        fridgy_db.commit()
-        print("SQL commit command completed...")
+            # Commit the transaction for DML queries like INSERT, UPDATE, DELETE
+            conn.commit()
+            print("SQL commit command completed...")
 
-    except (Exception, psycopg2.Error) as e:
-        print("Error while executing DML in PostgreSQL", e)
-        error_code = 1
+        except (Exception, psycopg2.Error) as e:
+            print("Error while executing DML in PostgreSQL", e)
+            error_code = 1
 
-    final_res = {"code": error_code, "res": result}
+        return {"code": error_code, "res": result}
 
-    return final_res
-
-def get_expiry_info(query) -> str:
+def get_expiry_info(query: str) -> str:
     """
     This function manages food expiry information based on user queries.
     """
