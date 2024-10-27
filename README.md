@@ -90,3 +90,78 @@ pip install -r requirements.txt
 ```bash
 uvicorn app.main:app --reload
 ```
+
+## Setting Up PostgresDB Locally
+
+Follow these steps to set up PostgresDB locally.
+
+1. Install [Homebrew](https://brew.sh/) 
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+2. Install Postgres
+
+Tutorial: https://www.codementor.io/@engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb
+
+```bash
+brew install postgresql
+```
+
+Start Postgres.
+
+```bash
+pg_ctl -D /usr/local/var/postgres start && brew services start postgresql
+```
+
+3. Configure Postgres
+```bash
+psql postgres
+```
+
+Once in Postgres client, create a user named rick with password 'rick'.
+
+```postgres
+CREATE ROLE rick WITH LOGIN PASSWORD 'rick';
+```
+
+Add CREATEDB permission to user rick to allow rick to create databases:
+
+```postgres
+ALTER ROLE rick CREATEDB;
+```
+
+4. Create database
+```postgres
+CREATE DATABASE fridgy;
+```
+
+Grant all database privileges to user rick. 
+```postgres
+GRANT ALL PRIVILEGES ON DATABASE fridgy TO rick;
+```
+
+Check tables in databases.
+```postgres
+\list
+```
+
+5. Make inventory table
+
+Log out of Postgres client with 'exit'. Log back in using:
+```bash
+psql fridgy -U rick
+```
+
+Make inventory table.
+```postgres
+CREATE TABLE IF NOT EXISTS inventory(
+id SERIAL PRIMARY KEY,
+email TEXT NOT NULL,
+item TEXT NOT NULL,
+quantity INTEGER NOT NULL,
+expiration_date TEXT NOT NULL
+);
+```
+
+Start running fridgy_postgres.ipynb notebook for testing.

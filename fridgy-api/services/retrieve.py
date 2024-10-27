@@ -1,8 +1,6 @@
-# retrieve.py
 import datetime
-import sqlite3
-
-from services.db import UserDB, InventoryDB
+from typing import Any, Dict
+import psycopg2
 
 # example Database of items and their expiry information
 expiry_database = {
@@ -23,46 +21,52 @@ def retrieve_relevant_info(query, context):
     # Placeholder implementation
     return f"Relevant info for query: {query[:20]}... Context length: {len(context)}"
 
-def get_inventory_info(email: str) -> str:
+
+def manage_inventory(dml: str) -> Dict[str, Any]:
     """
     INVENTORY MANAGEMENT
-    This function gets inventory information for a user query.
+    This function selects, updates, inserts, or removes food items with a quantity and expiration date for a user query.
     """
-    # Connect to and setup sqlite DB 
-    conn = sqlite3.connect('services/db/inventory.db')
-    inventory_db = InventoryDB(conn.cursor())
-    inventory_db.setup()
+    try:
+        fridgy_db = psycopg2.connect(
+            host="localhost",        # Adjust if necessary
+            user="",         # Your PostgreSQL username
+            password="",     # Your PostgreSQL password
+            database="fridgy"      # Your database name
+        # Automatically commit after every transaction
+        )
+        # Enable autocommit mode
+        fridgy_db.autocommit = True
+        print("Database connection successful!")
+    except Exception as e:
+        print(f"Error: {e}")
 
-    return f"Inventory info for query: {inventory_db.get_inventory_for_user(email=email)}..."
+    cursor = fridgy_db.cursor()
 
-def add_inventory_info(email: str, item: str, quantity: int, expiration_date: str) -> None:
-    """
-    INVENTORY MANAGEMENT
-    This function adds a food item, quantity, and expiration date of a food item based on a user query.
-    Only one set of an item, quantity, and expiration date can be added with each user query.
-    """
-    # Connect to and setup sqlite DB 
-    conn = sqlite3.connect('services/db/inventory.db')
-    inventory_db = InventoryDB(conn.cursor())
-    inventory_db.setup()
+    error_code = 0
+    result = None
 
-    # Insert item, quantity, and expiration date into inventory
-    inventory_db.insert_item(email=email, item=item, quantity=quantity, expiration_date=expiration_date)
+    try:
+        # Assuming you have an active connection and cursor
+        cursor.execute(dml)
 
-def remove_inventory_info(email: str, item: str, quantity: int, expiration_date: str) -> None:
-    """
-    INVENTORY MANAGEMENT
-    This function adds a food item, quantity, and expiration date of a food item based on a user query.
-    Only one set of an item, quantity, and expiration date can be added with each user query.
-    """
-    # Connect to and setup sqlite DB 
-    conn = sqlite3.connect('services/db/inventory.db')
-    inventory_db = InventoryDB(conn.cursor())
-    inventory_db.setup()
+        # Only fetch results for SELECT queries
+        if dml.strip().lower().startswith('select'):
+            result = cursor.fetchall()
+        else:
+            result = None
 
-    # Insert item, quantity, and expiration date into inventory
-    inventory_db.insert_item(email=email, item=item, quantity=quantity, expiration_date=expiration_date)
+        # Commit the transaction for DML queries like INSERT, UPDATE, DELETE
+        fridgy_db.commit()
+        print("SQL commit command completed...")
 
+    except (Exception, psycopg2.Error) as e:
+        print("Error while executing DML in PostgreSQL", e)
+        error_code = 1
+
+    final_res = {"code": error_code, "res": result}
+
+    return final_res
 
 def get_expiry_info(query) -> str:
     """
