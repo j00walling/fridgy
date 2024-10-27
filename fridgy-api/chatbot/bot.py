@@ -2,7 +2,6 @@ import os
 import json
 from dotenv import load_dotenv
 from openai import OpenAI
-
 from chatbot.prompts import MAIN_PROMPT  # Import the MAIN_PROMPT from prompts.py
 from services.retrieve import *
 from chatbot.tools import fridgy_tools, available_functions
@@ -17,7 +16,7 @@ class FridgyBot:
         self.context = [{'role': 'system', 'content': MAIN_PROMPT}]
         self.tools = fridgy_tools
 
-    def chat_complete_messages(self, messages, temperature) -> str:
+    def chat_complete_messages(self, messages, user_id: int = None) -> str:
         user_query = messages[-1]['content']
 
         # Check if the query is about expiration dates
@@ -32,7 +31,7 @@ class FridgyBot:
         # inventory_info = get_inventory_info(user_email)
         
         # Augment the user's query with relevant information
-        augmented_query = f"{user_query}\n\nAdditional context: {expiry_info}"
+        augmented_query = f"{user_query}\n\nAdditional context: {expiry_info}\n\nUser ID: {user_id}"
         
         # Replace the user's query in the last message with the augmented query
         full_context[-1]['content'] = augmented_query
@@ -49,11 +48,11 @@ class FridgyBot:
         # Update the context with the user message and the assistant's response
         if not tool_calls:
             self.context.append({'role': 'user', 'content': user_query})
-            self.context.append({'role': 'assistant', 'content': f"{assistant_message.content}"})
+            self.context.append({'role': 'assistant', 'content': f"{assistant_message}"})
         
         else:
             # Step 3: call the function.
-            self.context.append(assistant_message.content)
+            self.context.append(assistant_message)
 
             # Step 4: send the info for each function call and function response to the model
             for tool_call in tool_calls:
@@ -69,13 +68,9 @@ class FridgyBot:
                 )
 
                 if function_response["code"] != 0:
-                    function_message = "There are errors when calling function from GPT based program"
+                    function_message = "Something went wrong while querying the database"
                 else:
-                    function_message = "Inventory DB successfully at " + str(function_response["res"])
-
-                print(f"ChatBot: Oh, just found {function_message}")
-
-                function_message += str(datetime.now())
+                    function_message = f"Database query was successful! The following was returned: {function_response['res']}"
 
                 self.context.append(
                     {
@@ -85,11 +80,8 @@ class FridgyBot:
                         "content": function_message,
                     }
                 )
-
-            response = self.chat_completion_request(self.context, temperature=0, tools=fridgy_tools, tool_choice="auto")
-            #print(second_response)
-            print("ChatBot: ", response.choices[0].message.content)
             
+            response = self.chat_completion_request(self.context, temperature=0, tools=fridgy_tools, tool_choice="auto")
             self.context.append({'role': 'user', 'content': user_query})
             self.context.append({'role': 'assistant', 'content': response.choices[0].message.content})
 

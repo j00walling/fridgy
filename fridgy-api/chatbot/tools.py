@@ -15,14 +15,23 @@ fridgy_tools = [
                         the SQL should be written using the following database schema:
                         Table name: inventory
                         ####Columns Names and type:
-                        email TEXT PRIMARY KEY,
+                        user_id INTEGER PRIMARY KEY,
                         item TEXT NOT NULL,
                         quantity INTEGER NOT NULL,
-                        expiration_date TEXT NOT NULL
-                    );
+                        expiration_date DATE NOT NULL
 
-                      ####
-                        """,
+                        #### For INSERT operations:
+                        Use the following format to insert or update on conflict:
+                        ```sql
+                        INSERT INTO inventory (user_id, item, quantity, expiration_date) 
+                        VALUES (<user_id>, '<item>', <quantity>, '<expiration_date>')
+                        ON CONFLICT (user_id, item) 
+                        DO UPDATE SET 
+                            quantity = inventory.quantity + EXCLUDED.quantity, 
+                        ```
+                    
+                        ####
+                            """,
                     },
 
                 },

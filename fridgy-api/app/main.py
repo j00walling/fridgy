@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import query
+from app.routers import query, auth
 
 
 app = FastAPI()
@@ -13,8 +13,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(query.router)  # Include the query router
-
+app.include_router(query.router)
+app.include_router(auth.router)
 
 if __name__ == "__main__":
     import uvicorn

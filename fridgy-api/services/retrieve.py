@@ -1,4 +1,3 @@
-# retrieve.py
 import datetime
 from typing import Any, Dict
 import psycopg2
@@ -31,8 +30,8 @@ def manage_inventory(dml: str) -> Dict[str, Any]:
     try:
         fridgy_db = psycopg2.connect(
             host="localhost",        # Adjust if necessary
-            user="rick",         # Your PostgreSQL username
-            password="rick",     # Your PostgreSQL password
+            user="",         # Your PostgreSQL username
+            password="",     # Your PostgreSQL password
             database="fridgy"      # Your database name
         # Automatically commit after every transaction
         )
@@ -68,7 +67,6 @@ def manage_inventory(dml: str) -> Dict[str, Any]:
     final_res = {"code": error_code, "res": result}
 
     return final_res
-
 
 def get_expiry_info(query) -> str:
     """

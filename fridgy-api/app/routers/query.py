@@ -7,6 +7,7 @@ router = APIRouter()
 
 class Query(BaseModel):
     question: str
+    user_id: int | None = None
 
 fridgy_bot = FridgyBot()
 
@@ -16,5 +17,5 @@ def get_bot():
 @router.post("/api/query")
 async def process_query(query: Query, bot: FridgyBot = Depends(get_bot)):
     messages = [{'role': 'user', 'content': query.question}]
-    response = bot.chat_complete_messages(messages, 0)
+    response = fridgy_bot.chat_complete_messages(messages, user_id=query.user_id)
     return {"response": response, "context": bot.context}
