@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from chatbot.bot import FridgyBot
+from typing import Optional
 
 
 router = APIRouter()
 
 class Query(BaseModel):
     question: str
-    user_id: int | None = None
+    # user_id: int | None = None
+    user_id: Optional[int] = None
 
 fridgy_bot = FridgyBot()
 

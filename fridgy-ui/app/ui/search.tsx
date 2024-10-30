@@ -5,6 +5,10 @@ import { ArrowUpIcon } from "@heroicons/react/24/outline";
 import Loader from "@/app/ui/loader";
 import { SearchProps } from "@/app/types/interfaces";
 import clsx from "clsx";
+import { useEffect } from "react";
+import { MicrophoneIcon } from "@heroicons/react/24/outline";
+
+type SpeechRecognition = any;
 
 export default function Search({
   inputValue,
@@ -16,6 +20,30 @@ export default function Search({
   onSubmit: (question: string) => Promise<void>;
 }) {
   const [loading, setLoading] = useState<boolean>(false);
+  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
+
+  useEffect(() => {
+    if (!('webkitSpeechRecognition' in window)) {
+      console.warn("Speech recognition not supported in this browser.");
+      return;
+    }
+    const speechRecognition = new (window as any).webkitSpeechRecognition();
+    speechRecognition.continuous = true;
+    speechRecognition.interimResults = true;
+    speechRecognition.onresult = (event: any) => {
+      let finalTranscript = inputValue;
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+      setInputValue(finalTranscript + interimTranscript);
+    };
+    setRecognition(speechRecognition);
+  }, [setInputValue, inputValue]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -35,6 +63,12 @@ export default function Search({
     }
   };
 
+  const handleMicClick = () => {
+    if (recognition) {
+      recognition.start();
+    }
+  };
+
   return (
     <div className="relative flex flex-1 flex-shrink-0">
       <input
@@ -47,7 +81,7 @@ export default function Search({
       <button
         onClick={handleSubmit}
         className={clsx(
-          "absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 flex items-center justify-center rounded-full",
+          "absolute right-8 top-1/2 h-6 w-6 -translate-y-1/2 flex items-center justify-center rounded-full",
           {
             "bg-gray-900 text-white": inputValue,
             "bg-gray-300 text-gray-500": !inputValue,
@@ -56,6 +90,13 @@ export default function Search({
         disabled={loading}
       >
         {loading ? <Loader /> : <ArrowUpIcon className="h-4 w-4" />}
+      </button>
+      <button
+        onClick={handleMicClick}
+        className="absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 flex items-center justify-center rounded-full bg-gray-300 text-gray-500"
+        disabled={loading}
+      >
+        <MicrophoneIcon className="h-4 w-4" />
       </button>
     </div>
   );
