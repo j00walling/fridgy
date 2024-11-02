@@ -37,6 +37,7 @@ async def register(user: User, conn: connection = Depends(get_db)):
     """
     Registration endpoint to create a new user.
     """
+    print(f"user :{user}")
     with conn.cursor() as cursor:
         cursor.execute("SELECT COUNT(*) FROM users WHERE username = %s;", (user.username,))
         user_count = cursor.fetchone()[0]
