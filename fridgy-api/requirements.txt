@@ -12,6 +12,8 @@ idna==3.10
 jiter==0.6.1
 openai==1.52.0
 passlib==1.7.4
+pdfplumber==0.11.4
+pinecone==5.3.1
 psycopg2==2.9.10
 pydantic==2.9.2
 pydantic_core==2.23.4

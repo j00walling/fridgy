@@ -173,3 +173,17 @@ CREATE TABLE inventory (
 ```
 
 Run fridgy_postgres.ipynb notebook for testing.
+
+## Setting Up Environment (.env file)
+In order to successfully run Fridgy locally, create a .env file in the project base directory and include the following:
+```
+OPENAI_API_KEY=<Your OpenAI API Key>
+PINECONE_API_KEY=<Your Pinecone API Key>
+TOGETHER_API_KEY=<Your Together.ai API Key>
+PINECONE_ENVIRONMENT=us-east-1
+PINECONE_INDEX=fridgy
+DB_HOST=localhost
+DB_USER=<your postgres username>
+DB_PASSWORD=<your postgres password>
+DB_NAME=fridgy
+```

@@ -31,7 +31,7 @@ async def process_query(query: Query, bot: FridgyBot = Depends(get_bot)):
     return {"response": response, "context": bot.context}
 
 
-file_uploaded = True
+file_uploaded = False
 # Removed global variable and any file-specific state management.
 @router.post("/api/upload_pdf")
 async def upload_pdf(query: str = Form(...), file: UploadFile = File(...), bot: FridgyBot = Depends(get_bot)):
