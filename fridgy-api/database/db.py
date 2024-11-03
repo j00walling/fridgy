@@ -7,10 +7,10 @@ from psycopg2 import IntegrityError
 
 load_dotenv()
 
-DB_HOST = os.getenv("DB_HOST")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_NAME = os.getenv("DB_NAME")
+DB_HOST = 'localhost'
+DB_USER = 'rick'
+DB_PASSWORD = 'rick'
+DB_NAME = 'fridgy'
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

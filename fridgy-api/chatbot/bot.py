@@ -16,25 +16,31 @@ class FridgyBot:
         self.context = [{'role': 'system', 'content': MAIN_PROMPT}]
         self.tools = fridgy_tools
 
-    def chat_complete_messages(self, messages, user_id: int = None) -> str:
-        user_query = messages[-1]['content']
+    def chat_complete_messages(self, messages, user_id: int = None, process_raw = False) -> str:
 
-        # Check if the query is about expiration dates
-        expiry_info = get_expiry_info(user_query)
-    
+        print(f"chat_complete_messages (messages) <= ${messages}")
+
+        user_query = messages[-1]['content']
+       
         # Combine stored context with new messages
         full_context = self.context + messages
         
-        # # Function for retrieving previous chat context for a user
-        # # Use the retrieve module to call these functions
-        # relevant_info = retrieve.retrieve_relevant_info(user_query, full_context)
-        # inventory_info = get_inventory_info(user_email)
-        
-        # Augment the user's query with relevant information
-        augmented_query = f"{user_query}\n\nAdditional context: {expiry_info}\n\nUser ID: {user_id}"
-        
-        # Replace the user's query in the last message with the augmented query
-        full_context[-1]['content'] = augmented_query
+        if not process_raw:
+            # Check if the query is about expiration dates
+            expiry_info = get_expiry_info(user_query)
+            
+            # # Function for retrieving previous chat context for a user
+            # # Use the retrieve module to call these functions
+            # relevant_info = retrieve.retrieve_relevant_info(user_query, full_context)
+            # inventory_info = get_inventory_info(user_email)
+            
+            # Augment the user's query with relevant information
+            augmented_query = f"{user_query}\n\nAdditional context: {expiry_info}\n\nUser ID: {user_id}"
+                
+            # Replace the user's query in the last message with the augmented query
+            full_context[-1]['content'] = augmented_query
+
+        print(f"chat_complete_messages <= {full_context}")
         
         # Call the OpenAI API to get a completion
         response = self.chat_completion_request(full_context, 0, tools=fridgy_tools, tool_choice="auto")

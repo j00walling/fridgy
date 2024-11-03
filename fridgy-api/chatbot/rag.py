@@ -43,7 +43,7 @@ class FridgyRagger:
         return text
 
     @staticmethod
-    def chunk_text_with_strides(text: str, chunk_size: int = 500, stride: int = 250) -> list:
+    def chunk_text_with_strides(text: str, chunk_size: int = 1000, stride: int = 500) -> list:
         words = text.split()
         chunks = [
             ' '.join(words[i:i + chunk_size]) for i in range(0, len(words), stride)
@@ -69,22 +69,7 @@ class FridgyRagger:
         result = self.index.query(vector=query_embedding, top_k=top_k, include_metadata=True)
         return [match['metadata']['text'] for match in result['matches']]
 
-    def generate_summary(self, relevant_chunks: list, query: str) -> str:
-        summary_prompt = f"Suggest a receipe based on these ingredients: '{query}' only from the following recipes: '{' '.join(relevant_chunks)}'"
-        
-        # Using the updated chat completion call
-        response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",  # Specify the model, e.g., "gpt-3.5-turbo" or "gpt-4"
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": summary_prompt}
-            ],
-            max_tokens=200,
-            temperature=0.7
-        )
-        # Accessing the response content
-        response = response.choices[0].message.content
-        print(f"[Pinecone] Retrieved chunks: [{relevant_chunks}]")
-        print(f"[GPT] Prompt : {summary_prompt}")
-        print(f"[GPT] Response: [{response}]")
-        return response
+    from chatbot.prompts import MAIN_PROMPT  # Import the MAIN_PROMPT from prompts.py
+    def get_augmented_prompt_with_context(self, relevant_chunks: list, query: str) -> str:
+        augmented_prompt = f"'{query}' \n\n Uploded Receipes: \n\n'{' '.join(relevant_chunks)}'"
+        return augmented_prompt
