@@ -104,19 +104,19 @@ const ChatInterface = () => {
       alert('Please upload a recipe PDF');
       return;
     }
-
+  
     setIsUploading(true);
     const formData = new FormData();
     formData.append('file', file);
-
+  
     // Hardcoded test question for now, adjust as necessary
     const recipe_test_question = "Suggest a recipe for ingredients: \n\n'chicken breast, onion, white beans, chicken broth and sour cream' \n\nonly from the uploaded receipes:\n\n";
     formData.append('query', JSON.stringify({ question: recipe_test_question, user_id: user?.id || null }));
-
+  
     console.log(`Uploading: ${file}`);
 
     const PROCESSING = "Processing..."
-
+  
     try {
       // Add the new query placeholder to the chat
       const newQuery = { question: "Uploaded Recipe PDF", response: PROCESSING, timestamp: new Date() };
@@ -125,11 +125,11 @@ const ChatInterface = () => {
       const response = await axios.post('http://localhost:8000/api/upload_pdf', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-
+  
       // Extract the response content similar to handleSubmit
       const responseContent = response.data?.response?.choices?.[0]?.message?.content || "No response available";
       setContext(response.data.context);
-
+  
       // Update the response in queries to display it in the chat window
       setQueries(prevQueries => prevQueries.map(q =>
         q.question === "Uploaded Recipe PDF" && q.response === PROCESSING
@@ -168,20 +168,20 @@ const handleSubmit = async (question: string) => {
 
     const updatedContext = [...context, { role: 'user', content: question }];
 
-    const response = await axios.post<ApiResponse>('http://localhost:8000/api/query', {
+    const response = await axios.post<ApiResponse>('http://localhost:8000/api/query', { 
       question,
       user_id: user?.id || null,
-      context: updatedContext
+      context: updatedContext 
     });
-
+    
     setContext(response.data.context);
-
+    
     // Conditional check for response content to avoid runtime errors
     const responseContent = response.data?.response?.choices?.[0]?.message?.content || "No response available";
-
-    setQueries(prevQueries => prevQueries.map(q =>
-      q.question === question && q.response === "Thinking..."
-        ? { ...q, response: responseContent, timestamp: new Date() }
+    
+    setQueries(prevQueries => prevQueries.map(q => 
+      q.question === question && q.response === "Thinking..." 
+        ? { ...q, response: responseContent, timestamp: new Date() } 
         : q
     ));
   } catch (error) {

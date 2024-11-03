@@ -20,8 +20,9 @@ class FridgyBot:
 
         print(f"chat_complete_messages (messages) <= ${messages}")
 
-        user_query = messages[-1]['content']
 
+        user_query = messages[-1]['content']
+       
         # Combine stored context with new messages
         full_context = self.context + messages
         
@@ -36,7 +37,7 @@ class FridgyBot:
 
             # Augment the user's query with relevant information
             augmented_query = f"{user_query}\n\nAdditional context: {expiry_info}\n\nUser ID: {user_id}"
-
+                
             # Replace the user's query in the last message with the augmented query
             full_context[-1]['content'] = augmented_query
 
