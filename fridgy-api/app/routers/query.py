@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Form, File, UploadFile
 from pydantic import BaseModel
 from chatbot.bot import FridgyBot
+from typing import Optional
 from chatbot.rag import *
 from fastapi.responses import JSONResponse
 import json
@@ -9,7 +10,8 @@ router = APIRouter()
 
 class Query(BaseModel):
     question: str
-    user_id: int = None
+    # user_id: int | None = None
+    user_id: Optional[int] = None
 
 fridgy_bot = FridgyBot()
 
@@ -54,6 +56,6 @@ async def upload_pdf(query: str = Form(...), file: UploadFile = File(...), bot: 
     messages = [
         {'role': 'user', 'content': augmented_prompt},
     ]
-    
+
     response = fridgy_bot.chat_complete_messages(messages, user_id=query_obj.user_id, process_raw = True)
     return {"response": response, "context": bot.context}

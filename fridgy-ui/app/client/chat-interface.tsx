@@ -136,7 +136,7 @@ const ChatInterface = () => {
           ? { ...q, response: responseContent, timestamp: new Date() }
           : q
       ));
-  
+
       handleUploadModalClose(); // Close the modal on success
     } catch (error) {
       console.error('Error uploading file:', error);
@@ -316,4 +316,3 @@ const UploadModal: React.FC<{
   );
 
 };
-
