@@ -110,7 +110,9 @@ const ChatInterface = () => {
     formData.append('file', file);
   
     // Hardcoded test question for now, adjust as necessary
-    const recipe_test_question = "Suggest a recipe for ingredients: \n\n'chicken breast, onion, white beans, chicken broth and sour cream' \n\nonly from the uploaded receipes:\n\n";
+    // const recipe_test_question = "Suggest a recipe for ingredients: \n\n'chicken breast, onion, white beans, chicken broth and sour cream' \n\nonly from the uploaded receipes:\n\n";
+    const recipe_test_question = "Suggest a recipe based on whats in my fridge's inventory, only from the uploaded receipes:\n\n";
+
     formData.append('query', JSON.stringify({ question: recipe_test_question, user_id: user?.id || null }));
   
     console.log(`Uploading: ${file}`);
