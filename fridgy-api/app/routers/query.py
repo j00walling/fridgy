@@ -32,6 +32,7 @@ async def process_query(query: Query, bot: FridgyBot = Depends(get_bot)):
 
 
 file_uploaded = False
+image_uploaded = False
 # Removed global variable and any file-specific state management.
 @router.post("/api/upload_pdf")
 async def upload_pdf(query: str = Form(...), file: UploadFile = File(...), bot: FridgyBot = Depends(get_bot)):
@@ -55,6 +56,30 @@ async def upload_pdf(query: str = Form(...), file: UploadFile = File(...), bot: 
 
     messages = [
         {'role': 'user', 'content': augmented_prompt},
+    ]
+
+    response = fridgy_bot.chat_complete_messages(messages, user_id=query_obj.user_id, process_raw = True)
+    return {"response": response, "context": bot.context}
+
+@router.post("/api/upload_image")
+async def upload_image(query: str = Form(...), file: UploadFile = File(...), bot: FridgyBot = Depends(get_bot)):
+
+    global image_uploaded
+
+    # Parse the JSON-formatted query string to Query object
+    query_obj = Query(**json.loads(query))
+
+    print(f"upload_image <= {query_obj}")
+
+    if not image_uploaded:
+        image = await file.read()
+        image_description = "";
+        image_uploaded = True
+
+    inventory_add_prompt = "Please add 3 eggs";
+
+    messages = [
+        {'role': 'user', 'content': inventory_add_prompt},
     ]
 
     response = fridgy_bot.chat_complete_messages(messages, user_id=query_obj.user_id, process_raw = True)
