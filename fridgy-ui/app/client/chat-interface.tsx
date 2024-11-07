@@ -52,11 +52,13 @@ const ChatInterface = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isUploadImageModalOpen, setIsUploadImageModalOpen] = useState(false);
 
   // File upload states
   const [file, setFile] = useState<File | null>(null);
   const [summary, setSummary] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
@@ -90,6 +92,14 @@ const ChatInterface = () => {
 
   const handleUploadModalClose = () => {
     setIsUploadModalOpen(false);
+  };
+
+  const handleUploadImageClick = () => {
+    setIsUploadImageModalOpen(true);
+  };
+
+  const handleUploadImageModalClose = () => {
+    setIsUploadImageModalOpen(false);
   };
 
   // File selection handler
@@ -195,6 +205,54 @@ const handleSubmit = async (question: string) => {
   }
 };
 
+const handleUploadImageModalSubmit = async () => {
+  if (!file) {
+    alert('Please upload a inventory JPG');
+    return;
+  }
+
+  setIsUploadingImage(true);
+  const formData = new FormData();
+  formData.append('file', file);
+
+  // Hardcoded test question for now, adjust as necessary
+  // const recipe_test_question = "Suggest a recipe for ingredients: \n\n'chicken breast, onion, white beans, chicken broth and sour cream' \n\nonly from the uploaded receipes:\n\n";
+  const inventory_test_question = "Add inventory based on the uploaded image:\n\n";
+
+  formData.append('query', JSON.stringify({ question: inventory_test_question, user_id: user?.id || null }));
+
+  console.log(`Uploading: ${file}`);
+
+  const PROCESSING = "Processing..."
+
+  try {
+    // Add the new query placeholder to the chat
+    const newQuery = { question: "Uploaded Inventory Image", response: PROCESSING, timestamp: new Date() };
+    setQueries(prevQueries => [...prevQueries, newQuery]);
+
+    const response = await axios.post('http://localhost:8000/api/upload_image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    // Extract the response content similar to handleSubmit
+    const responseContent = response.data?.response?.choices?.[0]?.message?.content || "No response available";
+    setContext(response.data.context);
+
+    // Update the response in queries to display it in the chat window
+    setQueries(prevQueries => prevQueries.map(q =>
+      q.question === "Uploaded Inventory Image" && q.response === PROCESSING
+        ? { ...q, response: responseContent, timestamp: new Date() }
+        : q
+    ));
+
+    handleUploadImageModalClose(); // Close the modal on success
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    alert('An error occurred during file upload. Please try again.');
+  } finally {
+    setIsUploadingImage(false);
+  }
+};
 
   return (
     <main className="flex min-h-screen p-6">
@@ -240,6 +298,15 @@ const handleSubmit = async (question: string) => {
                     </button>
                     <button
                       onClick={() => {
+                        handleUploadImageClick();
+                        toggleDropdown();
+                      }}
+                      className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                    >
+                      Upload Inventory Image
+                    </button>
+                    <button
+                      onClick={() => {
                         handleLogoutClick();
                         toggleDropdown();
                       }}
@@ -255,6 +322,14 @@ const handleSubmit = async (question: string) => {
                     onFileChange={handleFileChange}
                     onSubmit={handleUploadModalSubmit}
                     isUploading={isUploading}
+                  />
+                )}
+                  {isUploadImageModalOpen && (
+                  <UploadImageModal
+                    onClose={handleUploadImageModalClose}
+                    onFileChange={handleFileChange}
+                    onSubmit={handleUploadImageModalSubmit}
+                    isUploading={isUploadingImage}
                   />
                 )}
               </div>
@@ -316,5 +391,26 @@ const UploadModal: React.FC<{
       </div>
     </div>
   );
+};
 
+const UploadImageModal: React.FC<{
+  onClose: () => void;
+  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSubmit: () => void;
+  isUploading: boolean;
+}> = ({ onClose, onFileChange, onSubmit, isUploading }) => {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded shadow-lg">
+        <h2 className="text-lg mb-4">Upload Inventory Image (JPG)</h2>
+        <input type="file" accept="image/*" onChange={onFileChange} />
+        <button onClick={onSubmit} disabled={isUploading} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
+        {isUploading ? "Uploading... " : "Upload "}
+        </button>
+        <button onClick={onClose} className="mt-2 px-4 py-2 text-gray-500">
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
 };
