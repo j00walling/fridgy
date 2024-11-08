@@ -8,6 +8,8 @@ from chatbot.tools import fridgy_tools, available_functions
 
 load_dotenv()
 
+
+import pprint
 class FridgyBot:
     def __init__(self):
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -18,10 +20,10 @@ class FridgyBot:
 
     def chat_complete_messages(self, messages, user_id: int = None, process_raw = False) -> str:
 
-        print(f"chat_complete_messages (messages) <= ${messages}")
-
+        pprint.pprint(f"chat_complete_messages (raw) <= ${messages}")
 
         user_query = messages[-1]['content']
+        augmented_query = f"{user_query}"
        
         # Combine stored context with new messages
         full_context = self.context + messages
@@ -36,12 +38,15 @@ class FridgyBot:
             # inventory_info = get_inventory_info(user_email)
 
             # Augment the user's query with relevant information
-            augmented_query = f"{user_query}\n\nAdditional context: {expiry_info}\n\nUser ID: {user_id}"
+            augmented_query = augmented_query + "\n\nAdditional context: {expiry_info}"
                 
-            # Replace the user's query in the last message with the augmented query
-            full_context[-1]['content'] = augmented_query
+        augmented_query = augmented_query +  f"\n\nUser ID: {user_id}"
 
-        print(f"chat_complete_messages <= {full_context}")
+        # Replace the user's query in the last message with the augmented query
+        full_context[-1]['content'] = augmented_query
+
+
+        pprint.pprint(f"chat_complete_messages (augmented) <= {full_context}")
         
         # Call the OpenAI API to get a completion
         response = self.chat_completion_request(full_context, 0, tools=fridgy_tools, tool_choice="auto")

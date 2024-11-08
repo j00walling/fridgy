@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, Form, File, UploadFile
 from pydantic import BaseModel
 from chatbot.bot import FridgyBot
 from typing import Optional
-from chatbot.rag import *
+from chatbot.rag import FridgyRagger
+from chatbot.clip import FridgyClipper
 from fastapi.responses import JSONResponse
 import json
 
@@ -17,6 +18,7 @@ fridgy_bot = FridgyBot()
 
 # Initialize the FridgyRagger
 fridgy_ragger = FridgyRagger()
+fridgy_clipper = FridgyClipper()
 
 def get_bot():
     return fridgy_bot
@@ -61,6 +63,8 @@ async def upload_pdf(query: str = Form(...), file: UploadFile = File(...), bot: 
     response = fridgy_bot.chat_complete_messages(messages, user_id=query_obj.user_id, process_raw = True)
     return {"response": response, "context": bot.context}
 
+from PIL import Image
+import io
 @router.post("/api/upload_image")
 async def upload_image(query: str = Form(...), file: UploadFile = File(...), bot: FridgyBot = Depends(get_bot)):
 
@@ -71,16 +75,15 @@ async def upload_image(query: str = Form(...), file: UploadFile = File(...), bot
 
     print(f"upload_image <= {query_obj}")
 
-    if not image_uploaded:
-        image = await file.read()
-        image_description = "";
-        image_uploaded = True
+    image = Image.open(io.BytesIO(await file.read())).convert("RGB")
 
-    inventory_add_prompt = "Please add 3 eggs";
+    augmented_prompt = fridgy_clipper.identify_grocery_items(image)
 
     messages = [
-        {'role': 'user', 'content': inventory_add_prompt},
+        {'role': 'user', 'content': augmented_prompt},
     ]
+
+    print(f"image_uploaded => {messages}")
 
     response = fridgy_bot.chat_complete_messages(messages, user_id=query_obj.user_id, process_raw = True)
     return {"response": response, "context": bot.context}
