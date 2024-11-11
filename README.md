@@ -1,6 +1,6 @@
 # Fridgy
 
-Fridgy is a Refrigerator Assistant Chatbot that helps users manage their refrigerator inventory and provides recipe suggestions based on the items available. The UI is built using the Next.js framework with React, and the backend is developed using Flask.
+Fridgy is a Refrigerator Assistant Chatbot that helps users manage their refrigerator inventory and provides recipe suggestions based on the items available. The UI is built using the Next.js framework with React, and the backend is developed using FastAPI, Open AI for LLM and Embedding models and Pinecone for Vector DB and RAG.
 
 ## Prerequisites
 
