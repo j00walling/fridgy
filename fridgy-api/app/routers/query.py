@@ -26,7 +26,7 @@ def get_bot():
 @router.post("/api/query")
 async def process_query(query: Query, bot: FridgyBot = Depends(get_bot)):
 
-    print(f"process_query <= $query")
+    print(f"process_query <= {query}")
 
     messages = [{'role': 'user', 'content': query.question}]
     response = fridgy_bot.chat_complete_messages(messages, user_id=query.user_id)

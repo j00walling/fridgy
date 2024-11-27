@@ -12,6 +12,7 @@ import clsx from "clsx";
 
 const PROCESSING = "Processing...";
 const DEFAULT_RECIPE_TEST_QUESTION = "Suggest a recipe based on what's in my fridge's inventory, only from the uploaded recipes:\n\n";
+const DEFAULT_IMAGE_TEST_QUESTION = "Add the following food items seen in the uploaded picture to my fridge's inventory:\n\n";
 const UPLOAD_MODAL_TYPE = {
   PDF: "PDF",
   IMAGE: "IMAGE",
@@ -100,7 +101,7 @@ const ChatInterface = () => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("query", JSON.stringify({
-      question: DEFAULT_RECIPE_TEST_QUESTION,
+      question: uploadModalType === "PDF" ? DEFAULT_RECIPE_TEST_QUESTION : DEFAULT_IMAGE_TEST_QUESTION,
       user_id: user?.id || null,
     }));
 
